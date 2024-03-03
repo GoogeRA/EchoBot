@@ -1,8 +1,7 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import CommandStart
-
-from EchoBotRobertGooge.Config import TOKEN
+from Config import TOKEN
 bot = Bot(token=TOKEN)
 
 dp = Dispatcher()
