@@ -1,16 +1,22 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import CommandStart
-from Config import TOKEN
-bot = Bot(token=TOKEN)
+
+bot = Bot(token='6986192274:AAEd6IA1aaGCmwqYQRSZ3dKIROftiwiwN0M')
 
 dp = Dispatcher()
+
+
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
-    await message.answer("Добро пожаловать?!")
+    await message.answer("Приветствую, это эхо-бот!")
+
+
 @dp.message()
 async def echo(message: types.Message):
     await message.answer(message.text)
+
+
 async def main():
     await dp.start_polling(bot)
 
