@@ -1,1 +1,1 @@
-TOKEN = ('6617471934:AAEIdw1NvQOn6etW8l3CDM3OCgnhxq_gWuo')
+TOKEN = ('')
