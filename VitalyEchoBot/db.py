@@ -80,7 +80,6 @@ class MetricPlan(Base):
     value_date = Column('value_date', TIMESTAMP)
     div_id = Column('div_id', Integer, ForeignKey("division_type.id"))
     created_at = Column('created_at', TIMESTAMP)
-
     def __init__(self, fact_id, metric_id, value, value_date, div_id, created_at):
         self.fact_id = fact_id
         self.metric_id = metric_id
