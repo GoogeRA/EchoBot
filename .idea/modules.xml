@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../.env/.idea/.env.iml" filepath="$PROJECT_DIR$/../.env/.idea/.env.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/EchoBot.iml" filepath="$PROJECT_DIR$/.idea/EchoBot.iml" />
+    </modules>
+  </component>
+</project>
