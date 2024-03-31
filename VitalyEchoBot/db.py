@@ -86,7 +86,7 @@ class MetricFact(Base):
         self.created_at = created_at
 
     def __repr__(self):
-        return f"(ID: {self.fact_id} {self.value} {self.value_date} {self.created_at})"
+        return f"{self.value}, {self.value_date}, {self.created_at}"
 
 
 class MetricPlan(Base):
@@ -252,6 +252,7 @@ def get_data(metric: str, date_calc_type: str, div_type: str,  date: datetime.da
             .filter(MetricFact.value_date <= datetime.date(date.year, date.month, date.day + 1))
 
     return query
+
 
 """
 metric = "Выручка"
