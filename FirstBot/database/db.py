@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, ForeignKey, Column, Integer, VARCHAR, Float, TIMESTAMP, Boolean
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from config import settings
+
+from typing import Type
 import datetime
 
 Base = declarative_base()
@@ -68,46 +70,82 @@ class Metric(Base):
         return f"(ID: {self.metric_id} {self.name} ед.: {self.measure_unit})"
 
 
-class MetricFact(Base):
-    __tablename__ = "metric_fact"
-    fact_id = Column('id', Integer, primary_key=True)
-    metric_id = Column('metric_id', Integer, ForeignKey("metric.id"))
-    value = Column('metric_value', Float)
-    value_date = Column('value_date', TIMESTAMP)
-    div_id = Column('div_id', Integer, ForeignKey("division.id"))
-    created_at = Column('created_at', TIMESTAMP)
+class MetricTypes:
+    class MetricFact(Base):
+        __tablename__ = "metric_fact"
+        fact_id = Column('id', Integer, primary_key=True)
+        metric_id = Column('metric_id', Integer, ForeignKey("metric.id"))
+        value = Column('metric_value', Float)
+        value_date = Column('value_date', TIMESTAMP)
+        div_id = Column('div_id', Integer, ForeignKey("division.id"))
+        created_at = Column('created_at', TIMESTAMP)
 
-    def __init__(self, fact_id, metric_id, value, value_date, div_id, created_at):
-        self.fact_id = fact_id
-        self.metric_id = metric_id
-        self.value = value
-        self.value_date = value_date
-        self.div_id = div_id
-        self.created_at = created_at
+        metric = relationship("Metric")
 
-    def __repr__(self):
-        return f"{self.value}, {self.value_date}, {self.created_at}"
+        def __init__(self, fact_id, metric_id, value, value_date, div_id, created_at):
+            self.fact_id = fact_id
+            self.metric_id = metric_id
+            self.value = value
+            self.value_date = value_date
+            self.div_id = div_id
+            self.created_at = created_at
+
+        def __repr__(self):
+            metric_name = self.metric.name if self.metric else "Unkown"
+            self.value_date = self.value_date.strftime('%H:%M %d-%m-%Y')
+            self.created_at = self.created_at.strftime('%H:%M %d-%m-%Y')
+            return f'Значение показателя "{metric_name}": {self.value},\nНа дату: {self.value_date},\nБыл записан: {self.created_at}'
 
 
-class MetricPlan(Base):
-    __tablename__ = "metric_plan"
-    plan_id = Column('id', Integer, primary_key=True)
-    metric_id = Column('metric_id', Integer, ForeignKey("metric.id"))
-    value = Column('metric_value', Float)
-    value_date = Column('value_date', TIMESTAMP)
-    div_id = Column('div_id', Integer, ForeignKey("division.id"))
-    created_at = Column('created_at', TIMESTAMP)
+    class MetricPlan(Base):
+        __tablename__ = "metric_plan"
+        plan_id = Column('id', Integer, primary_key=True)
+        metric_id = Column('metric_id', Integer, ForeignKey("metric.id"))
+        value = Column('metric_value', Float)
+        value_date = Column('value_date', TIMESTAMP)
+        div_id = Column('div_id', Integer, ForeignKey("division.id"))
+        created_at = Column('created_at', TIMESTAMP)
 
-    def __init__(self, plan_id, metric_id, value, value_date, div_id, created_at):
-        self.plan_id = plan_id
-        self.metric_id = metric_id
-        self.value = value
-        self.value_date = value_date
-        self.div_id = div_id
-        self.created_at = created_at
+        metric = relationship('Metric')
 
-    def __repr__(self):
-        return f"(ID: {self.plan_id} {self.value} {self.value_date} {self.created_at})"
+        def __init__(self, plan_id, metric_id, value, value_date, div_id, created_at):
+            self.plan_id = plan_id
+            self.metric_id = metric_id
+            self.value = value
+            self.value_date = value_date
+            self.div_id = div_id
+            self.created_at = created_at
+
+        def __repr__(self):
+            metric_name = self.metric.name if self.metric else "Unkown"
+            self.value_date = self.value_date.strftime('%H:%M %d-%m-%Y')
+            self.created_at = self.created_at.strftime('%H:%M %d-%m-%Y')
+            return f'Значение показателя "{metric_name}": {self.value},\nНа дату: {self.value_date},\nБыл записан: {self.created_at}'
+
+    class MetricPredict(Base):
+        __tablename__ = "metric_predict"
+        predict_id = Column('id', Integer, primary_key=True)
+        metric_id = Column('metric_id', Integer, ForeignKey("metric.id"))
+        value = Column('metric_value', Float)
+        value_date = Column('value_date', TIMESTAMP)
+        div_id = Column('div_id', Integer, ForeignKey("division.id"))
+        created_at = Column('created_at', TIMESTAMP)
+
+        metric = relationship('Metric')
+
+        def __init__(self, predict_id, metric_id, value, value_date, div_id, created_at):
+            self.predict_id = predict_id
+            self.metric_id = metric_id
+            self.value = value
+            self.value_date = value_date
+            self.div_id = div_id
+            self.created_at = created_at
+
+        def __repr__(self):
+            metric_name = self.metric.name if self.metric else "Unkown"
+            self.value_date = self.value_date.strftime('%H:%M %d-%m-%Y')
+            self.created_at = self.created_at.strftime('%H:%M %d-%m-%Y')
+            return f'Значение показателя "{metric_name}": {self.value},\nНа дату: {self.value_date},\nБыл записан: {self.created_at}'
 
 
 engine = create_engine(
@@ -237,29 +275,38 @@ session.add_all([
 session.commit()
 """
 
+# metricFact = MetricTypes.MetricFact
+# metricPlan = MetricTypes.MetricPlan
+# metricPredict = MetricTypes.MetricPredict
 
-def get_data(metric: str, date_calc_type: str, div_type: str,  date: datetime.date = None):
-    query = session.query(MetricFact) \
-        .filter(MetricFact.metric_id == Metric.metric_id) \
+
+
+def get_data(metric_type: Type[MetricTypes], metric: str, date_calc_type: str, div_type: str,  date: datetime.date = None, date_stop: datetime.date = None):
+    query = session.query(metric_type.value, metric_type.value_date, metric_type.created_at) \
+        .join(Metric, metric_type.metric_id == Metric.metric_id) \
         .filter(Metric.name == metric) \
         .filter(Metric.calc_type_id == MetricCalcType.type_id) \
         .filter(MetricCalcType.name == date_calc_type) \
-        .filter(MetricFact.div_id == Division.div_id) \
+        .filter(metric_type.div_id == Division.div_id) \
         .filter(Division.name == div_type)
 
-    if date:
-        query = query.filter(MetricFact.value_date >= date)\
-            .filter(MetricFact.value_date <= datetime.date(date.year, date.month, date.day + 1))
+    if date and not date_stop:
+        query = query.filter(metric_type.value_date >= date) \
+            .filter(metric_type.value_date <= datetime.date(date.year, date.month, date.day + 1))
+    elif date and date_stop:
+        query = query.filter(metric_type.value_date >= date) \
+            .filter(metric_type.value_date <= datetime.date(date_stop.year, date_stop.month, date_stop.day))
+
 
     return query
 
 
-"""
-metric = "Выручка"
-date_type = "На дату"
-div_type = "Регион"
-date = datetime.date(2024, 3, 23)
-data = get_data(metric, date_type, div_type)
-for i in data:
-    print(i)
-"""
+
+# metric_type = metricFact
+# metric = "Выручка"
+# date_type = "На дату"
+# div_type = "Регион"
+# date = datetime.date(2024, 3, 23)
+# data = get_data(metric_type, metric, date_type, div_type)
+# print(data.all())
+
