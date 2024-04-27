@@ -1,5 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+#from EchoBot.FirstBot.database.db import MetricTypes
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 
 start_kb_inline = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -11,6 +13,16 @@ start_kb_inline = InlineKeyboardMarkup(
 
 # start_kb_inline = InlineKeyboardBuilder()
 # start_kb_inline.add(InlineKeyboardButton(text='Посмотреть показатель', callback_data='Посмотреть показатель'))
+
+# get_metric_type_inline = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Фактический", callback_data="metricFact"),
+#             InlineKeyboardButton(text="Плановый", callback_data="metricPlan"),
+#             InlineKeyboardButton(text="Прогнозовый", callback_data="metricPredict"),
+#         ]
+#     ]
+# )
 
 get_index_type_inline = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -38,7 +50,9 @@ get_date_type_inline = InlineKeyboardMarkup(
 get_div_type_inline = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Регион", callback_data="Регион")
+            InlineKeyboardButton(text="Регион", callback_data="Регион"),
+            InlineKeyboardButton(text="Проект", callback_data="Проект"),
+            InlineKeyboardButton(text="Объект", callback_data="Объект")
         ]
     ]
 )

@@ -2,9 +2,10 @@ from aiogram import types, F, Router
 from aiogram.filters import CommandStart, StateFilter, or_f
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from keyboards import authorized_user_kbds
-# from database import db
-from keyboards.inline import start_kb_inline, get_index_type_inline, get_date_type_inline, get_div_type_inline
+from EchoBot.FirstBot.keyboards import authorized_user_kbds
+from EchoBot.FirstBot.database import db
+from EchoBot.FirstBot.keyboards.inline import start_kb_inline, get_index_type_inline, get_date_type_inline, get_div_type_inline
+import EchoBot.FirstBot.handlers.case_mapping as case_mapping
 
 user_private_router = Router()
 
@@ -92,16 +93,38 @@ async def det_date_type_cmd(callback: types.CallbackQuery, state: FSMContext):
         await state.set_state(ShowIndex.div_type)
     else:
         await state.update_data(date=None)
+        await state.update_data(date_stop=None)
         await callback.message.edit_text(text="Выберите тип среза", reply_markup=get_div_type_inline)
         await state.set_state(ShowIndex.div_type)
 
 
-@user_private_router.callback_query(ShowIndex.div_type, or_f(F.data == "Регион"))
+@user_private_router.callback_query(ShowIndex.div_type,
+                                    or_f(F.data == "Регион", F.data == "Проект", F.data == "Объект"))
 async def get_div_type_cmd(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(div_type=callback.data)
-    data = await state.get_data()
-    #    answer = db.get_data(data["index_type"], data["date_type"], data["div_type"], data["date"])
-    await callback.message.edit_text("data:   " + str(data), reply_markup=None)
-    #    await message.answer(answer)
+    request = await state.get_data()
+    result = case_mapping.generate_result_string(request)
+    answerFact = db.get_data(db.MetricTypes.MetricFact, request["index_type"], request["date_type"], request["div_type"], request["date"], request["date_stop"]).all()
+    answerPlan = db.get_data(db.MetricTypes.MetricPlan, request["index_type"], request["date_type"], request["div_type"], request["date"], request["date_stop"]).all()
+    answerPredict = db.get_data(db.MetricTypes.MetricPredict, request["index_type"], request["date_type"], request["div_type"], request["date"], request["date_stop"]).all()
+    await callback.message.edit_text("Данные по запросу:   " + result, reply_markup=None)
+    await callback.message.answer("Фактические значения показателя: " )
+    for i in range(len(answerFact)):
+        await   callback.message.answer("Значение: " + str(answerFact[i][0]) +
+                                        "\nНа дату: " + answerFact[i][1].strftime('%d-%m-%Y') +
+                                        "\nЗаписан: " + answerFact[i][2].strftime('%d-%m-%Y'))
+
+    await callback.message.answer("Плановые значения показателя: " )
+    for i in range(len(answerPlan)):
+        await   callback.message.answer("Значение: " + str(answerPlan[i][0]) +
+                                        "\nНа дату: " + answerPlan[i][1].strftime('%d-%m-%Y') +
+                                        "\nЗаписан: " + answerPlan[i][2].strftime('%d-%m-%Y'))
+
+    await callback.message.answer("Прогнозные значения показателя: " )
+    for i in range(len(answerPredict)):
+        await   callback.message.answer("Значение: " + str(answerPredict[i][0]) +
+                                        "\nНа дату: " + answerPredict[i][1].strftime('%d-%m-%Y') +
+                                        "\nЗаписан: " + answerPredict[i][2].strftime('%d-%m-%Y'))
+
     await callback.message.answer("Выберите действие", reply_markup=start_kb_inline)
     await state.clear()

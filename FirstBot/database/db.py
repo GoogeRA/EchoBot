@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, VARCHAR, Float, TIMESTAMP, Boolean
+from sqlalchemy import create_engine, ForeignKey, Column, Integer, VARCHAR, Float, TIMESTAMP, Boolean, union_all
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from config import settings
 
@@ -281,32 +281,33 @@ session.commit()
 
 
 
-def get_data(metric_type: Type[MetricTypes], metric: str, date_calc_type: str, div_type: str,  date: datetime.date = None, date_stop: datetime.date = None):
+def get_data(metric_type: Type[MetricTypes], index_type: str, date_calc_type: str, div_type: str,  date: datetime.date = None, date_stop: datetime.date = None):
     query = session.query(metric_type.value, metric_type.value_date, metric_type.created_at) \
         .join(Metric, metric_type.metric_id == Metric.metric_id) \
-        .filter(Metric.name == metric) \
+        .filter(Metric.name == index_type) \
         .filter(Metric.calc_type_id == MetricCalcType.type_id) \
         .filter(MetricCalcType.name == date_calc_type) \
         .filter(metric_type.div_id == Division.div_id) \
         .filter(Division.name == div_type)
 
-    if date and not date_stop:
-        query = query.filter(metric_type.value_date >= date) \
-            .filter(metric_type.value_date <= datetime.date(date.year, date.month, date.day + 1))
-    elif date and date_stop:
+    if date_stop:
         query = query.filter(metric_type.value_date >= date) \
             .filter(metric_type.value_date <= datetime.date(date_stop.year, date_stop.month, date_stop.day))
-
-
+    elif date:
+        query = query.filter(metric_type.value_date >= date) \
+            .filter(metric_type.value_date <= datetime.date(date.year, date.month, date.day + 1))
     return query
 
 
 
-# metric_type = metricFact
+# metric_type = MetricTypes.MetricFact
 # metric = "Выручка"
 # date_type = "На дату"
-# div_type = "Регион"
-# date = datetime.date(2024, 3, 23)
-# data = get_data(metric_type, metric, date_type, div_type)
-# print(data.all())
+# div_type = "Проект"
+# date_start = datetime.date(2020, 3, 23)
+# date_stop = datetime.date(2025, 4, 29)
+#
+# all_metric_data = get_data(metric_type, metric, date_type, div_type, date_start, date_stop )
+#
+# print(all_metric_data.all())
 
