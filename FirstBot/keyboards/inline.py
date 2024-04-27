@@ -1,3 +1,5 @@
+import calendar
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 #from EchoBot.FirstBot.database.db import MetricTypes
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -23,6 +25,35 @@ start_kb_inline = InlineKeyboardMarkup(
 #         ]
 #     ]
 # )
+date_years_inline = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="2022", callback_data="year_2022"),
+            InlineKeyboardButton(text="2023", callback_data="year_2023"),
+            InlineKeyboardButton(text="2024", callback_data="year_2024"),
+        ]
+    ]
+)
+
+months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+date_months_inline = InlineKeyboardBuilder()
+for i in range(0,12):
+    date_months_inline.add(InlineKeyboardButton(text=months[i], callback_data='month_'+str(i+1)))
+
+
+def date_days_inline(month: int):
+    year = 2024
+    date_days_inline_kb = InlineKeyboardBuilder()
+    weekday, days = calendar.monthrange(year, month)
+    for i in range(weekday):
+        date_days_inline_kb.add(InlineKeyboardButton(text='-', callback_data='day_None'))
+    for i in range(1, days+1):
+        date_days_inline_kb.add(InlineKeyboardButton(text=str(i), callback_data='day_'+str(i)))
+    for i in range(35 - weekday - days):
+        date_days_inline_kb.add(InlineKeyboardButton(text='-', callback_data='day_None'))
+    return date_days_inline_kb.adjust(7, 7, 7, 7, 7).as_markup()
+
 
 get_index_type_inline = InlineKeyboardMarkup(
     inline_keyboard=[
