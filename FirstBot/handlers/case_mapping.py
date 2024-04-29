@@ -1,4 +1,12 @@
-metric_mapping = {
+from EchoBot.FirstBot.database.db import MetricTypes
+
+
+metric_type_mapping = {
+    MetricTypes.MetricFact: "Фактические значения показателя:",
+    MetricTypes.MetricPlan: "Плановые значения показателя:",
+    MetricTypes.MetricPredict: "Прогнозные значения показателя:"
+}
+index_mapping = {
     'Выручка': 'Выручка',
     'Затраты': 'Затраты',
     'Прибыль': 'Прибыль'
@@ -17,14 +25,20 @@ division_mapping = {
     'Объект': {'nominative': 'объект', 'prepositional': 'по объекту'}
 }
 
+def metric_mapping(metric: MetricTypes):
+    result = ''.join(metric_type_mapping.get(metric, ''))
+    return  result
+
+# request = MetricTypes.MetricFact
+# print(metric_mapping(request))
 
 def generate_result_string(request_dict):
     result_parts = []
 
     if 'index_type' in request_dict:
-        metric_type = request_dict['index_type']
-        if metric_type in metric_mapping:
-            result_parts.append(metric_mapping[metric_type])
+        index_type = request_dict['index_type']
+        if index_type in index_mapping:
+            result_parts.append(index_mapping[index_type])
 
     if 'date_type' in request_dict:
         date_type = request_dict['date_type']
