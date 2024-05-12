@@ -49,9 +49,9 @@ def generate_result_string(request_dict):
     if 'date' in request_dict and request_dict['date']:
         date = request_dict['date']
         if 'date_stop' in request_dict and request_dict['date_stop']:
-            result_parts.append(f"с даты '{date}' по дату '{request_dict['date_stop']}'")
+            result_parts.append(f"с даты '{date.strftime('%d-%m-%Y')}' по дату '{request_dict['date_stop'].strftime('%d-%m-%Y')}'")
         else:
-            result_parts.append(f"на дату '{date}'")
+            result_parts.append(f"на дату '{date.strftime('%d-%m-%Y')}'")
 
     if 'div_type' in request_dict:
         div_type = request_dict['div_type']

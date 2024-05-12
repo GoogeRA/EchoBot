@@ -87,7 +87,8 @@ async def det_date_type_cmd(callback: types.CallbackQuery, state: FSMContext):
     elif callback.data == "С даты на дату":
         await callback.message.edit_text(text="Выберите год",
                                          reply_markup=date_years_inline)
-        await state.update_data(date_state='None')
+        await state.update_data(date_type='На дату')
+        await state.update_data(date_state=['Range', 'Not set'])
         await state.set_state(ShowIndex.date)
     else:
         await state.update_data(date=None)
@@ -98,36 +99,89 @@ async def det_date_type_cmd(callback: types.CallbackQuery, state: FSMContext):
 
 @user_private_router.callback_query(ShowIndex.date, F.data.startswith('year_'))
 async def get_year_cmd(callback: types.CallbackQuery, state: FSMContext):
-    
-    year = int(callback.data.split('_')[-1])
-    await state.update_data(date=date(year, 1, 1))
-    await callback.message.edit_text(text="Выберите месяц",
-                                     reply_markup=date_months_inline.adjust(3, 3, 3, 3).as_markup())
+    data = await state.get_data()
+    date_state = data.get('date_state')
+
+    if date_state == 'One':
+        year = int(callback.data.split('_')[-1])
+        await state.update_data(date=date(year, 1, 1))
+        await callback.message.edit_text(text="Выберите месяц",
+                                         reply_markup=date_months_inline.adjust(3, 3, 3, 3).as_markup())
+    elif date_state == ['Range', 'Not set']:
+        year = int(callback.data.split('_')[-1])
+        await state.update_data(date=date(year, 1, 1))
+        await callback.message.edit_text(text="Выберите месяц",
+                                         reply_markup=date_months_inline.adjust(3, 3, 3, 3).as_markup())
+    elif date_state == ['Range', 'Set']:
+        year = int(callback.data.split('_')[-1])
+        await state.update_data(date_stop=date(year, 1, 1))
+        await callback.message.edit_text(text="Выберите месяц",
+                                         reply_markup=date_months_inline.adjust(3, 3, 3, 3).as_markup())
+
 
 
 @user_private_router.callback_query(ShowIndex.date, F.data.startswith('month_'))
 async def get_month_cmd(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    year = data["date"].year
-    month = int(callback.data.split('_')[-1])
-    await state.update_data(date=date(year, month, 1))
-    await callback.message.edit_text(text="Выберите день",
-                                     reply_markup=date_days_inline(month))
+    date_state = data.get('date_state')
+    if date_state == 'One':
+        year = data["date"].year
+        month = int(callback.data.split('_')[-1])
+        await state.update_data(date=date(year, month, 1))
+        await callback.message.edit_text(text="Выберите день",
+                                         reply_markup=date_days_inline(month))
+    elif date_state == ['Range', 'Not set']:
+        year = data["date"].year
+        month = int(callback.data.split('_')[-1])
+        await state.update_data(date=date(year, month, 1))
+        await callback.message.edit_text(text="Выберите день",
+                                         reply_markup=date_days_inline(month))
+    elif date_state == ['Range', 'Set']:
+        year = data["date_stop"].year
+        month = int(callback.data.split('_')[-1])
+        await state.update_data(date_stop=date(year, month, 1))
+        await callback.message.edit_text(text="Выберите день",
+                                         reply_markup=date_days_inline(month))
 
 
 @user_private_router.callback_query(ShowIndex.date, F.data.startswith('day_'))
 async def get_month_cmd(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    year = data["date"].year
-    month = data["date"].month
-    day_str = callback.data.split('_')[-1]
-    if day_str != 'None':
-        day = int(day_str)
-        await state.update_data(date=date(year, month, day))
-        await callback.message.edit_text(text="Выберите тип среза", reply_markup=get_div_type_inline)
-        await state.set_state(ShowIndex.div_type)
-    else:
-        return
+    date_state = data.get('date_state')
+
+    if date_state == 'One':
+        year = data["date"].year
+        month = data["date"].month
+        day_str = callback.data.split('_')[-1]
+        if day_str != 'None':
+            day = int(day_str)
+            await state.update_data(date=date(year, month, day))
+            await callback.message.edit_text(text="Выберите тип среза", reply_markup=get_div_type_inline)
+            await state.set_state(ShowIndex.div_type)
+        else:
+            return
+    elif date_state == ['Range', 'Not set']:
+        year = data["date"].year
+        month = data["date"].month
+        day_str = callback.data.split('_')[-1]
+        if day_str != 'None':
+            day = int(day_str)
+            await state.update_data(date=date(year, month, day))
+            await state.update_data(date_state=['Range', 'Set'])
+            await callback.message.edit_text(text="Выберите конечную дату", reply_markup=date_years_inline)
+            await state.set_state(ShowIndex.date)
+        else:
+            return
+    elif date_state == ['Range', 'Set']:
+        year = data["date_stop"].year
+        month = data["date_stop"].month
+        day_str = callback.data.split('_')[-1]
+        if day_str != 'None':
+            day = int(day_str)
+            await state.update_data(date_stop=date(year, month, day))
+            await callback.message.edit_text(text="Выберите тип среза", reply_markup=get_div_type_inline)
+            await state.set_state(ShowIndex.div_type)
+
 
 
 
