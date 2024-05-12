@@ -49,12 +49,10 @@ def create_graph(metric_data):
     plt.plot(plan_dates, plan_values, label='Plan', marker='s')
     plt.plot(predict_dates, predict_values, label='Predict', marker='^')
 
-    plt.xticks(rotation=45)
-
     # Customize plot
-    plt.title('Выбранные показатели')
-    plt.xlabel('Дата')
-    plt.ylabel('Значение показателя')
+    plt.title('Metrics Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
     plt.grid(True)
     plt.legend()
 

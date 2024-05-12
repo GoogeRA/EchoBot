@@ -9,10 +9,11 @@ import EchoBot.FirstBot.handlers.case_mapping as case_mapping
 from datetime import date
 from EchoBot.FirstBot.handlers.graph_handler import  create_graph, test_graph
 from aiogram.types import  BufferedInputFile
+from EchoBot.FirstBot.filters.authorized_filter import IsAuthorized
 
 
 user_private_router = Router()
-
+user_private_router.message.filter(IsAuthorized())
 
 class ShowIndex(StatesGroup):
     index_type = State()
@@ -205,7 +206,6 @@ async def get_div_type_cmd(callback: types.CallbackQuery, state: FSMContext):
 async def get_graph_cmd(callback: types.CallbackQuery, state: FSMContext):
     action_choice = callback.data
 
-    await callback.message.delete()
     if action_choice == "Посмотреть показатель":
         await state.clear()
     elif action_choice == "Создать график":
@@ -218,9 +218,6 @@ async def get_graph_cmd(callback: types.CallbackQuery, state: FSMContext):
 
         input_file = BufferedInputFile(img_buffer.getvalue(), filename='graph.py')
         await callback.bot.send_photo(callback.message.chat.id, photo=input_file)
-        await state.clear()
-        await callback.message.answer("Выберите действие", reply_markup=start_kb_inline)
-
         # await callback.message.answer(str(metric_data))
         # await callback.message.answer(str(state_data))
 
