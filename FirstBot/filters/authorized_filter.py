@@ -10,3 +10,12 @@ class IsAuthorized(Filter):
     async def __call__(self, message: types.Message):
         return is_authorized(message.from_user.id)
 
+
+class NotAuthorized(Filter):
+    def __init__(self) -> None:
+        pass
+
+    async def __call__(self, message: types.Message):
+        return not(is_authorized(message.from_user.id))
+
+

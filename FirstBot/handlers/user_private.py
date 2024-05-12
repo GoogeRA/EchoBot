@@ -15,13 +15,13 @@ from EchoBot.FirstBot.filters.authorized_filter import IsAuthorized
 user_private_router = Router()
 user_private_router.message.filter(IsAuthorized())
 
+
 class ShowIndex(StatesGroup):
     index_type = State()
     date_type = State()
     date = State()
     div_type = State()
     graph = State()
-
 
 
 async def send_metric_data(message: types.Message, metric_types: list, request: dict):
