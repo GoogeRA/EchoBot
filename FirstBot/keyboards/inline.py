@@ -13,18 +13,16 @@ start_kb_inline = InlineKeyboardMarkup(
     ]
 )
 
-# start_kb_inline = InlineKeyboardBuilder()
-# start_kb_inline.add(InlineKeyboardButton(text='Посмотреть показатель', callback_data='Посмотреть показатель'))
+start_or_graph_kb_inline = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text='Посмотреть показатель', callback_data='Посмотреть показатель'),
+            InlineKeyboardButton(text='Создать график', callback_data='Создать график')
+        ]
+    ]
+)
 
-# get_metric_type_inline = InlineKeyboardMarkup(
-#     inline_keyboard=[
-#         [
-#             InlineKeyboardButton(text="Фактический", callback_data="metricFact"),
-#             InlineKeyboardButton(text="Плановый", callback_data="metricPlan"),
-#             InlineKeyboardButton(text="Прогнозовый", callback_data="metricPredict"),
-#         ]
-#     ]
-# )
+
 date_years_inline = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -73,7 +71,8 @@ get_date_type_inline = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="На конец года", callback_data="На конец года"),
-            InlineKeyboardButton(text="На дату", callback_data="На дату")
+            InlineKeyboardButton(text="На дату", callback_data="На дату"),
+            InlineKeyboardButton(text="С даты на дату", callback_data="С даты на дату")
         ]
     ]
 )
