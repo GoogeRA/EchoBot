@@ -42,9 +42,10 @@ def generate_result_string(request_dict):
 
     if 'date_type' in request_dict:
         date_type = request_dict['date_type']
-        if date_type in date_type_mapping:
-            case_forms = date_type_mapping[date_type]
-            result_parts.append(case_forms.get('nominative', ''))
+        if date_type != 'На дату':
+            if date_type in date_type_mapping:
+                case_forms = date_type_mapping[date_type]
+                result_parts.append(case_forms.get('nominative', ''))
 
     if 'date' in request_dict and request_dict['date']:
         date = request_dict['date']
